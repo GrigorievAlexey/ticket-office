@@ -21,13 +21,9 @@ module.exports = function (mongoose) {
   });
 
   Schema.post('save', function (ticket) {
-    console.log('this fired after a document was saved');
     return mongoose.model('Event')
       .findByIdAndUpdate(ticket.event, {$push: {'tickets': ticket._id}}, {'new': true})
       .exec()
-      .then((doc) => {
-        console.log('seved', doc);
-      })
       .catch((err) => {
         console.err(err);
       });

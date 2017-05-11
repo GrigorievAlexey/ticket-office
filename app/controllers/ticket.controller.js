@@ -9,9 +9,26 @@ const log = require('config/log')(module);
 const db = require('config/mongoose')
 const Ticket = db.model('Ticket');
 const HTTP_STATUSES = require('http-statuses');
+const reservationService = require('app/lib/services/reservation.service');
 
 module.exports = (req, res) => {
   log.info('Ticket controller');
+
+  // Actions handling
+  if (req.params.action) {
+    if (req.params.action === 'reserve') {
+      return reservationService.reserve(req.params.id)
+        .then(() => {
+          return res.send({message: 'Reservation complete'});
+        })
+        .catch((err) => {
+          log.error(err);
+          return res.status(err.httpStatus && err.httpStatus.code || 500)
+            .send('Reservation failed: ' + err.message);
+        });
+    }
+    return res.status(HTTP_STATUSES.BAD_REQUEST.code).send('No such action');
+  }
 
   // Insert handling
   if (req.method === 'POST') {

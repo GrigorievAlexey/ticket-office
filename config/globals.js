@@ -8,4 +8,5 @@ module.exports = {
     RESERVED: 1,
     BOUGHT: 2,
   },
+  reservationPeriod: 1000 * 5, // in ms
 };
