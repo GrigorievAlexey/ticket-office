@@ -1,25 +1,28 @@
 'use strict';
 
-let config = require('./config/config');
-let httpPort = config.httpPort;
-let httpsPort = config.httpsPort;
+require('app-module-path').addPath(__dirname);
 
-let fs = require('fs');
-let http = require('http');
-let https = require('https');
-let privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
-let certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+const fs = require('fs');
+const log = require('config/log')(module);
+const http = require('http');
+const https = require('https');
+const { httpPort, httpsPort, hostName } = require('config/env');
+const privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
+const certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+};
 
-let credentials = {key: privateKey, cert: certificate};
-let express = require('express');
-let app = express();
+const app = require('config/express')();
 
-let httpServer = http.createServer(app);
-let httpsServer = https.createServer(credentials, app);
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);
 
-httpServer.listen(httpPort, function () {
-  console.log(`HTTP listening on ${httpPort}`)
+httpServer.listen(httpPort, () => {
+  log.info(`HTTP listening on http://${hostName}:${httpPort}`)
 });
-httpsServer.listen(httpsPort, function () {
-  console.log(`HTTPS listening on ${httpsPort}`)
+
+httpsServer.listen(httpsPort, () => {
+  log.info(`HTTPS listening on https://${hostName}:${httpsPort}`)
 });
