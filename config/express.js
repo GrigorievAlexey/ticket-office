@@ -9,9 +9,13 @@ const multipart = require('connect-multiparty');
 const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser');
 const apiRouter = require('app/routes/api.routes');
+const passport = require('config/passport');
+
 
 module.exports = () => {
   const app = express();
+
+  app.use(passport.initialize());
 
   require('app/lib/middleware/request-log')(app);
 
@@ -26,7 +30,10 @@ module.exports = () => {
   app.use(cookieParser());
 
   require('app/lib/middleware/helmet')(app);
+
+  require('app/routes/common.routes')(app);
   app.use('/api', apiRouter);
+
   log.info('Starting app...');
   return app;
 };
