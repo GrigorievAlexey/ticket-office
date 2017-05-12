@@ -92,8 +92,8 @@ module.exports = (req, res) => {
     let query = req.params.id ? {_id: req.params.id} : {};
     let findType = req.params.id ? 'findOne' : 'find';
     return User[findType](query, {
-      username: true,
-      createdAt: true,
+      hashedPassword: false,
+      salt: false,
     })
       .then((result) => {
         if (!result) {

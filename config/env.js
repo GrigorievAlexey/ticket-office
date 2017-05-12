@@ -16,5 +16,15 @@ module.exports = {
   stripe: {
     publishableKey: env.STRIPE_PUBLISHABLE_KEY || 'pk_test_JzmOfTAgfdpZ88Dxi9EXIUR8',
     secretKey: env.STRIPE_SECRET_KEY || 'sk_test_W3mPpNQZCZnXd4qfZDgatSbv',
-  }
+  },
+  email: {
+    from: 'Ticket-Office <no-reply@gmail.com>',
+    options: {
+      service: env.MAILER_SERVICE_PROVIDER || 'gmail',
+      auth: {
+        user: env.EMAIL_ADDR || 'grigoriev.aleks@gmail.com',
+        pass: env.EMAIL_PASS || 'VEGbzklEMcUJs9h8vLbE',
+      },
+    },
+  },
 };

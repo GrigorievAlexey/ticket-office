@@ -18,7 +18,7 @@ module.exports = (app) => {
 
     let newUser = new User(req.body);
 
-    return newUser.save
+    return newUser.save()
       .then(() => {
         return res.send({message: 'User has been created'});
       })

@@ -11,7 +11,7 @@ const Ticket = require('config/mongoose').model('Ticket');
 const HTTP_STATUSES = require('http-statuses');
 
 module.exports = {
-  reserve(ticketId) {
+  reserve(ticketId, user) {
     return Ticket.findById(ticketId)
       .then((ticket) => {
         if (!ticket) {
@@ -21,6 +21,7 @@ module.exports = {
           throw HTTP_STATUSES.BAD_REQUEST.createError('Cannot reserve this ticket')
         }
         ticket.status = Ticket.TICKET_STATUSES.RESERVED;
+        ticket.owner = user._id;
         return ticket.save()
       })
       .then(() => {

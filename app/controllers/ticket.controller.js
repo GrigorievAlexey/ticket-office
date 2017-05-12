@@ -19,7 +19,7 @@ module.exports = (req, res) => {
   if (req.params.action) {
     // Reservation handling
     if (req.params.action === 'reserve') {
-      return reservationService.reserve(req.params.id)
+      return reservationService.reserve(req.params.id, req.user)
         .then(() => {
           return res.send({message: 'Reservation complete'});
         })

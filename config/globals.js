@@ -3,10 +3,11 @@
  */
 
 module.exports = {
+  appName: 'Ticket-Office',
   TICKET_STATUSES: {
     AVAILABLE: 0,
     RESERVED: 1,
     BOUGHT: 2,
   },
-  reservationPeriod: 1000 * 5, // in ms
+  reservationPeriod: 1000 * 60 * 5, // in ms
 };
