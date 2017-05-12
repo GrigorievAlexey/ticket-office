@@ -20,7 +20,8 @@ options.jwtFromRequest = ExtractJwt.fromAuthHeader();
 options.secretOrKey = config.secret;
 
 passport.use(new JwtStrategy(options, (jwt_payload, done) => {
-  return User.findOne({_id: jwt_payload.id})
+  return User.findOne({_id: jwt_payload.id}, {hashedPassword: false, salt: false})
+    .lean()
     .then((user) => {
       if (user) {
         return done(null, user);

@@ -9,6 +9,7 @@ const crypto = require('crypto');
 
 module.exports = function (mongoose) {
   let Schema = new mongoose.Schema({
+    // TODO: Validate as email
     username: {
       type: String,
       unique: true,

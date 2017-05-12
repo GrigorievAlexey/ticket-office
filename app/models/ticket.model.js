@@ -17,6 +17,10 @@ module.exports = function (mongoose) {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Event',
       required: true,
+    },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      allowNull: true,
     }
   });
 
@@ -28,6 +32,8 @@ module.exports = function (mongoose) {
         console.err(err);
       });
   });
+
+  // TODO: Handle removing of tickets
 
   Schema.statics.TICKET_STATUSES = TICKET_STATUSES;
 

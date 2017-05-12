@@ -28,7 +28,7 @@ module.exports = (req, res) => {
           if (!user) {
             throw HTTP_STATUSES.NOT_FOUND.createError('No user with such username');
           }
-          user.verificationCode = Math.random().toString(10).substr(2, 8);
+          user.verificationCode = Math.random().toString(10).substr(2, 6);
           return user.save();
         })
         .then((user) => {
@@ -68,8 +68,6 @@ module.exports = (req, res) => {
         });
     }
 
-
-    return res.status(HTTP_STATUSES.BAD_REQUEST.code).send('No such action');
   }
 
   // Insert handling
@@ -88,6 +86,9 @@ module.exports = (req, res) => {
 
   // Select handling
   if (req.method === 'GET') {
+    if (req.params.action === 'me' || req.params.id === 'me') {
+      req.params.id = req.user._id
+    }
     let query = req.params.id ? {_id: req.params.id} : {};
     let findType = req.params.id ? 'findOne' : 'find';
     return User[findType](query, {

@@ -10,12 +10,14 @@ const db = require('config/mongoose')
 const Ticket = db.model('Ticket');
 const HTTP_STATUSES = require('http-statuses');
 const reservationService = require('app/lib/services/reservation.service');
+const stripe = require('app/lib/services/stripe.service');
 
 module.exports = (req, res) => {
   log.info('Ticket controller');
 
   // Actions handling
   if (req.params.action) {
+    // Reservation handling
     if (req.params.action === 'reserve') {
       return reservationService.reserve(req.params.id)
         .then(() => {
@@ -25,6 +27,25 @@ module.exports = (req, res) => {
           log.error(err);
           return res.status(err.httpStatus && err.httpStatus.code || 500)
             .send('Reservation failed: ' + err.message);
+        });
+    }
+    // Buying handling
+    if (req.params.action === 'buy' && req.method === 'POST') {
+      if (!req.body.token) {
+        return res.status(HTTP_STATUSES.BAD_REQUEST.code).send({message: 'Token should be specified'});
+      }
+      return stripe.buyTicket({
+          ticketId: req.params.id,
+          customer: req.user,
+          token: req.body.token,
+        })
+        .then(() => {
+          return res.send({message: 'Ticket purchased'});
+        })
+        .catch((err) => {
+          log.error(err);
+          return res.status(err.httpStatus && err.httpStatus.code || err.statusCode || 500)
+            .send({message: 'Purchase failed: ' + err.message});
         });
     }
     return res.status(HTTP_STATUSES.BAD_REQUEST.code).send('No such action');
@@ -68,7 +89,7 @@ module.exports = (req, res) => {
   // Update handling
   if (req.method === 'PUT' || req.method === 'PATCH') {
     if (!req.params.id) {
-      return res.send(HTTP_STATUSES.BAD_REQUEST.createError('Id should be specified'));
+      return res.status(HTTP_STATUSES.BAD_REQUEST.code).send({message: 'Id should be specified'});
     }
 
     return Ticket.update(
