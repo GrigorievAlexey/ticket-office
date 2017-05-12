@@ -33,20 +33,20 @@ module.exports = function (mongoose) {
     },
 
     /* For reset password */
-    resetPasswordToken: {
+    phoneNumber: {
       type: String,
-      allowNull: true
+      validate: {
+        validator(string) {
+          return /\+\d{11}/.test(string);
+        },
+        message: '{VALUE} is not a valid phone number!'
+      },
+      required: true
     },
-    resetPasswordExpires: {
-      type: Date
+    verificationCode: {
+      type: String,
+      allowNull: true,
     },
-    /* For email verification */
-    emailVerificationToken: {
-      type: String
-    },
-    emailVerificationExpires: {
-      type: Date
-    }
   });
 
   /**

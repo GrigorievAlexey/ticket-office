@@ -11,7 +11,7 @@ const passport = require('config/passport');
 
 apiRouter.all('*', passport.authenticate('jwt', { session: false }));
 
-apiRouter.all('/users/:id?', userController);
+apiRouter.all(['/users/:action?', '/users/:id?/:action?'], userController);
 apiRouter.all('/events/:id?', eventController);
 apiRouter.all(['/tickets/:id?', '/events/:eventId/tickets/:id?/:action?'], ticketController);
 
