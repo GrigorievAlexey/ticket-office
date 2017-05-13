@@ -13,6 +13,7 @@ apiRouter.all('*', passport.authenticate('jwt', { session: false }));
 
 apiRouter.all([
   '/tickets/:id?',
+  '/tickets/:id?/:action?',
   '/events/:eventId/tickets/:id?/:action?',
   '/users/:userId/tickets/:id?',
 ], ticketController);

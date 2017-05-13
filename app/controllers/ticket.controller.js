@@ -69,10 +69,16 @@ module.exports = (req, res) => {
 
   // Select handling
   if (req.method === 'GET') {
+    if (req.params.userId === 'me' || req.params.id === 'me') {
+      req.params.userId = req.user._id
+    }
     let query = req.params.id ? {_id: req.params.id} : {};
     let findType = req.params.id ? 'findOne' : 'find';
     if (req.params.eventId) {
       query.event = req.params.eventId;
+    }
+    if (req.params.userId) {
+      query.owner = req.params.userId;
     }
     return Ticket[findType](query)
       .then((result) => {
