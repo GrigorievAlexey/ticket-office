@@ -9,6 +9,7 @@ const multipart = require('connect-multiparty');
 const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser');
 const apiRouter = require('app/routes/api.routes');
+const errorHandler = require('app/lib/middleware/error-handler');
 const passport = require('config/passport');
 
 
@@ -33,6 +34,8 @@ module.exports = () => {
 
   require('app/routes/common.routes')(app);
   app.use('/api', apiRouter);
+
+  app.use(errorHandler);
 
   log.info('Starting app...');
   return app;

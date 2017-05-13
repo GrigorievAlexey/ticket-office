@@ -40,7 +40,7 @@ module.exports = (app) => {
 
         if (user.authenticate(req.body.password)) {
           let payload = {id: user._id};
-          let token = jwt.sign(payload, config.secret);
+          let token = jwt.sign(payload, config.secret, {expiresIn: '1h'});
           res.send({message: "ok", token: token});
         } else {
           res.status(HTTP_STATUSES.BAD_REQUEST.code).json({message:"Wrong password"});
@@ -48,6 +48,57 @@ module.exports = (app) => {
       })
       .catch((err) => {
         return res.status(err.httpStatus && err.httpStatus.code || 500).send(err.message);
+      });
+  });
+
+  // Forgot password endpoint
+  app.post('/forgot', (req, res) => {
+
+    if (!req.body.username) {
+      return res.status(HTTP_STATUSES.BAD_REQUEST.code).send('Username should be specified');
+    }
+    return User.findOne({ username: req.body.username })
+      .then((user) => {
+        if (!user) {
+          throw HTTP_STATUSES.NOT_FOUND.createError('No user with such username');
+        }
+        user.verificationCode = Math.random().toString(10).substr(2, 6);
+        return user.save();
+      })
+      .then((user) => {
+        return twilio.sendSmsTo(user.phoneNumber, `Verification code: ${user.verificationCode}`);
+      })
+      .then(() => {
+        return res.send({ message: 'Verification code was sent' });
+      })
+      .catch((err) => {
+        res.status(err.httpStatus && err.httpStatus.code || 500).send(err.message);
+      });
+  });
+
+  // Restore password endpoint
+  app.post('/reset', (req, res) => {
+    if (!req.body.verificationCode || !req.body.username || !req.body.newPassword) {
+      return res
+        .status(HTTP_STATUSES.BAD_REQUEST.code)
+        .send('Verification code, username and new password should be specified');
+    }
+    return User.findOne({username: req.body.username})
+      .then((user) => {
+        if (!user) {
+          throw HTTP_STATUSES.NOT_FOUND.createError('No user with such username');
+        }
+        if (user.verificationCode !== req.body.verificationCode) {
+          throw HTTP_STATUSES.BAD_REQUEST.createError('Wrong verification code');
+        }
+        user.password = req.body.newPassword;
+        return user.save();
+      })
+      .then(() => {
+        res.send({message: 'Password successfully changed'})
+      })
+      .catch((err) => {
+        res.status(err.httpStatus && err.httpStatus.code || 500).send(err.message);
       });
   });
 };
