@@ -4,6 +4,7 @@
 
 'use strict';
 
+const _ = require('lodash');
 const log = require('config/log')(module);
 const db = require('config/mongoose');
 const Event = db.model('Event');

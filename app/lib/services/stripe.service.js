@@ -31,7 +31,7 @@ module.exports = {
         }
         context.ticket = ticket;
         return stripe.charges.create({
-          amount: ticket.event.price * 100, // since stripe use cents here
+          amount: ticket.event.price * 100, // multiply on 100 since stripe use cents here
           currency: 'usd',
           description: `Purchasing ticket for "${ticket.event.name}" event by ${options.customer.username} user`,
           source: options.token,

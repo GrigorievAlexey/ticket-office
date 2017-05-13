@@ -26,14 +26,21 @@ module.exports = function (mongoose) {
 
   Schema.post('save', function (ticket) {
     return mongoose.model('Event')
-      .findByIdAndUpdate(ticket.event, {$push: {'tickets': ticket._id}}, {'new': true})
+      .findByIdAndUpdate(ticket.event, {$addToSet: {'tickets': ticket._id}}, {'new': true})
       .exec()
       .catch((err) => {
         console.err(err);
       });
   });
 
-  // TODO: Handle removing of tickets
+  Schema.pre('remove', function (ticket) {
+    return mongoose.model('Event')
+      .findByIdAndUpdate(ticket.event, {$pull: {'tickets': ticket._id}})
+      .exec()
+      .catch((err) => {
+        console.err(err);
+      });
+  });
 
   Schema.statics.TICKET_STATUSES = TICKET_STATUSES;
 

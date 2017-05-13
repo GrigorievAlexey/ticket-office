@@ -30,9 +30,9 @@ module.exports = {
                 <br>
                 <p>The ${config.appName} Support Team</p>
               </body>
-             </html>` // html body
+             </html>`,
     });
-    transport.sendMailAsync(mailOptions)
+    return transport.sendMailAsync(mailOptions)
       .then((info) => {
         log.info('Message %s sent: %s', info.messageId, info.response);
       })
