@@ -31,7 +31,6 @@ module.exports = function (mongoose) {
       type: Date,
       default: Date.now
     },
-    /* For reset password */
     phoneNumber: {
       type: String,
       validate: {
@@ -42,6 +41,7 @@ module.exports = function (mongoose) {
       },
       required: true
     },
+    /* For reset password */
     verificationCode: {
       type: String,
       allowNull: true,

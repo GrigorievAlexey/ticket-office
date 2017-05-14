@@ -4,26 +4,31 @@
 
 "use strict";
 
+const _ = require('lodash');
 const db = require('config/mongoose');
 const User = db.model('User');
 const jwt = require('jsonwebtoken');
 const config = require('config/env');
 const HTTP_STATUSES = require('http-statuses');
+const twilio = require('app/lib/services/twilio.service');
+
 
 module.exports = (app) => {
   app.post('/signup', (req, res) => {
     if (!req.body.username || !req.body.password) {
       return res.status(HTTP_STATUSES.BAD_REQUEST.code).send({message: 'User name and password should be specified'});
     }
-
+    console.log(req.path, req.params, req.body);
     let newUser = new User(req.body);
 
     return newUser.save()
-      .then(() => {
-        return res.send({message: 'User has been created'});
+      .then((result) => {
+        let savedUser = _.pick(result, ['_id', 'username', 'createdAt', 'phoneNumber']);
+        return res.status(HTTP_STATUSES.CREATED.code).send(savedUser);
       })
       .catch((err) => {
-        return res.status(err.httpStatus && err.httpStatus.code || 500).send(err.message);
+        console.error(err);
+        return res.status(err.httpStatus && err.httpStatus.code || 500).send(err);
       });
   });
 
@@ -60,7 +65,7 @@ module.exports = (app) => {
     return User.findOne({ username: req.body.username })
       .then((user) => {
         if (!user) {
-          throw HTTP_STATUSES.NOT_FOUND.createError('No user with such username');
+          throw HTTP_STATUSES.BAD_REQUEST.createError({ message: 'No user with such username' });
         }
         user.verificationCode = Math.random().toString(10).substr(2, 6);
         return user.save();
@@ -69,9 +74,10 @@ module.exports = (app) => {
         return twilio.sendSmsTo(user.phoneNumber, `Verification code: ${user.verificationCode}`);
       })
       .then(() => {
-        return res.send({ message: 'Verification code was sent' });
+        return res.status(HTTP_STATUSES.NO_CONTENT.code).send({ message: 'Verification code was sent' });
       })
       .catch((err) => {
+        console.error(err);
         res.status(err.httpStatus && err.httpStatus.code || 500).send(err.message);
       });
   });
@@ -95,7 +101,7 @@ module.exports = (app) => {
         return user.save();
       })
       .then(() => {
-        res.send({message: 'Password successfully changed'})
+        res.status(HTTP_STATUSES.NO_CONTENT.code).send({message: 'Password successfully changed'})
       })
       .catch((err) => {
         res.status(err.httpStatus && err.httpStatus.code || 500).send(err.message);

@@ -55,7 +55,7 @@ function insert(req, res)  {
   let ticket = new Ticket(req.body);
   return ticket.save()
     .then((result) => {
-      res.send(result);
+      res.status(HTTP_STATUSES.CREATED.code).send(result);
     })
     .catch((err) => {
       log.error(err);
@@ -95,10 +95,13 @@ function update(req, res) {
     return res.status(HTTP_STATUSES.BAD_REQUEST.code).send({message: 'Id should be specified'});
   }
 
-  return Ticket.update(
+  return Ticket.findOneAndUpdate(
     {_id: req.params.id},
     req.body,
-    {upsert: true}
+    {
+      upsert: true,
+      new: true,
+    }
   )
     .then((result) => {
       res.send(result);
@@ -117,7 +120,7 @@ function remove(req, res) {
   }
   return Ticket.remove({_id: req.params.id})
     .then((result) => {
-      res.send(result);
+      res.status(HTTP_STATUSES.NO_CONTENT.code).send(result);
     })
     .catch((err) => {
       log.error(err);
@@ -141,6 +144,7 @@ module.exports = function (router) {
   router.get(routes, find);
   router.post(routes, insert);
   router.put(routes, update);
+  router.patch(routes, update);
   router.delete(routes, remove);
 };
 

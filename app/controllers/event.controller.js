@@ -15,7 +15,7 @@ function insert(req, res) {
   let event = new Event(req.body);
   return event.save()
     .then((result) => {
-      res.send(result);
+      res.status(HTTP_STATUSES.CREATED.code).send(result);
     })
     .catch((err) => {
       log.error(err);
@@ -46,10 +46,13 @@ function update(req, res) {
   if (!req.params.id) {
     return res.send(HTTP_STATUSES.BAD_REQUEST.createError('Id should be specified'));
   }
-  return Event.update(
+  return Event.findOneAndUpdate(
       {_id: req.params.id},
       req.body,
-      {upsert: true}
+      {
+        upsert: true,
+        new: true,
+      }
     )
     .then((result) => {
       res.send(result);
@@ -67,7 +70,7 @@ function remove(req, res) {
   }
   return Event.remove({_id: req.params.id})
     .then((result) => {
-      res.send(result);
+      res.status(HTTP_STATUSES.NO_CONTENT.code).send(result);
     })
     .catch((err) => {
       log.error(err);
@@ -82,5 +85,6 @@ module.exports = function (router) {
   router.get(routes, find);
   router.post(routes, insert);
   router.put(routes, update);
+  router.patch(routes, update);
   router.delete(routes, remove);
 };
