@@ -1,7 +1,3 @@
-/**
- * Created by vedi on 08/07/16.
- */
-
 'use strict';
 
 const _ = require('lodash');
@@ -21,11 +17,6 @@ const FIXTURE_TYPES = {
   EVENT: 'event.data',
   TICKET: 'ticket.data',
 };
-
-// const clientAuth = {
-//   client_id: testConfig.client.clientId,
-//   client_secret: testConfig.client.clientSecret,
-// };
 
 const specHelper = {
 
@@ -106,29 +97,9 @@ const specHelper = {
       })
   },
 
-  // getClientAuth(client = testConfig.client) {
-  //   return {
-  //     client_id: client.clientId,
-  //     client_secret: client.clientSecret,
-  //   };
-  // },
-
-  // getBasicAuth(client) {
-  //   const clientId = client ? client.clientId : clientAuth.client_id;
-  //   const clientSecret = client ? client.clientSecret : clientAuth.client_secret;
-  //
-  //   return new Buffer(`${clientId}:${clientSecret}`).toString('base64');
-  // },
-
   getAdminUser() {
     return Object.assign({}, config.defaultUser);
   },
-
-  // fetchAndClearSentEmails() {
-  //   return this
-  //     .get(`${testConfig.baseUrl}/testing/sent-emails`)
-  //     .then(result => result.body);
-  // },
 
   signupUser({ data }) {
     return this
